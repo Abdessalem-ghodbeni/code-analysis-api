@@ -10,13 +10,19 @@ def get_code_files(project_path):
         if not os.path.isfile(file):
             continue
 
-        # Vérifier la liste noire
-        if any(
-            fnmatch.fnmatch(file, pattern) for pattern in settings.BLACKLISTED_FILES
-        ):
+        # Exclusion stricte des assets et dépendances
+        ignore_patterns = [
+            "**/assets/**/*",
+            "**/static/**/*",
+            "**/vendor/**/*",
+            "**/node_modules/**/*",
+            "**/*.min.*",
+            "**/*.html",  # Exclure les templates HTML
+        ]
+
+        if any(fnmatch.fnmatch(file, p) for p in ignore_patterns):
             continue
 
-        # Vérifier les extensions valides
         ext = os.path.splitext(file)[1].lower()
         if ext in settings.VALID_EXTENSIONS:
             files.append(file)
